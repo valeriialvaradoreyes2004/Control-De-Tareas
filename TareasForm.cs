@@ -12,9 +12,16 @@ namespace ControlDeTareas
 {
     public partial class TareasForm : MetroFramework.Forms.MetroForm
     {
+        private GestorProyectos gestorProyectos = new GestorProyectos();
+        private List<Proyectos> listaProyectos;
         public TareasForm()
         {
             InitializeComponent();
+        }
+
+        private void btnAgregar_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

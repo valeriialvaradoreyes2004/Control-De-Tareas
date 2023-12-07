@@ -64,9 +64,11 @@
       <DependentUpon>ClienteForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GestorClientes.cs" />
+    <Compile Include="GestorProyectos.cs" />
     <Compile Include="GestorTareas.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Proyectos.cs" />
     <Compile Include="SistemaTareasDataSet.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

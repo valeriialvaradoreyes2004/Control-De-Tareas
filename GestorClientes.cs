@@ -4,43 +4,38 @@ using System.Data.SqlClient;
 
 namespace ControlDeTareas
 {
-    internal class GestorClientes
+    internal class GestorProyectos
     {
-        private string cadenaConexion = "Data Source=PAVILION-G-15\\SQLEXPRESS;Initial Catalog=SistemaTareas;Integrated Security=True;Encrypt=False0"; // Reemplaza con tu cadena de conexión
-        private int proximoId;
-
-        public GestorClientes()
-        {
-            proximoId = 1;
-        }
+        private string cadenadeConexion = "Data Source=PAVILION-G-15\\SQLEXPRESS;Initial Catalog=SistemaTareas;Integrated Security=True;Encrypt=False0"; // Reemplaza con tu cadena de conexión
        
-        public List<Cliente> ObtenerClientesDB()
+        public List<Proyectos> ObtenerProyectosDB()
         {
-            List<Cliente> listaClientes = new List<Cliente>();
+            List<Proyectos> listaProyectos = new List<Proyectos>();
 
             try
             {
-                using (SqlConnection conexion = new SqlConnection(cadenaConexion))
+                using (SqlConnection conexion = new SqlConnection(cadenadeConexion))
                 {
                     conexion.Open();
 
-                    string consulta = "SELECT * FROM Clientes";
+                    string consulta = "SELECT * FROM Proyectos";
                     using (SqlCommand comando = new SqlCommand(consulta, conexion))
                     {
                         using (SqlDataReader reader = comando.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                Cliente cliente = new Cliente
+                                Proyectos proyecto = new Proyectos
                                 {
-                                    ClienteId = Convert.ToInt32(reader["ClienteId"]),
+                                    ProyectoId = Convert.ToInt32(reader["ProyectoId"]),
                                     Nombre = reader["Nombre"].ToString(),
-                                    Telefono = reader["Telefono"].ToString(),
-                                    Correo = reader["Correo"].ToString(),
-                                    DireccionFisica = reader["DireccionFisica"].ToString()
+                                    FechaInicio = Convert.ToDateTime(reader["FechaInicio"]),
+                                    FechaFin = Convert.ToDateTime(reader["FechaFin"]),
+                                    Estado = reader["Estado"].ToString(),
+                                    ClienteId = Convert.ToInt32(reader["ClienteId"])
                                 };
 
-                                listaClientes.Add(cliente);
+                                listaProyectos.Add(proyecto);
                             }
                         }
                     }
@@ -48,13 +43,13 @@ namespace ControlDeTareas
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error al obtener clientes desde la base de datos: " + ex.Message);
+                Console.WriteLine("Error al obtener proyectos desde la base de datos: " + ex.Message);
             }
 
-            return listaClientes;
+            return listaProyectos;
         }
 
-        public void AgregarCliente(string nombre, string telefono, string correo, string direccion)
+        public void AgregarProyecto(string nombre, DateTime fechaInicio, DateTime fechaFin, string estado, int clienteId)
         {
             try
             {
@@ -62,62 +57,13 @@ namespace ControlDeTareas
                 {
                     conexion.Open();
 
-                    string consulta = "INSERT INTO Clientes (Nombre, Telefono, Correo, DireccionFisica) VALUES (@Nombre, @Telefono, @Correo, @Direccion)";
+                    string consulta = "INSERT INTO Proyectos (Nombre, FechaInicio, FechaFin, Estado, ClienteId) VALUES (@Nombre, @FechaInicio, @FechaFin, @Estado, @ClienteId)";
                     using (SqlCommand comando = new SqlCommand(consulta, conexion))
                     {
                         comando.Parameters.AddWithValue("@Nombre", nombre);
-                        comando.Parameters.AddWithValue("@Telefono", telefono);
-                        comando.Parameters.AddWithValue("@Correo", correo);
-                        comando.Parameters.AddWithValue("@Direccion", direccion);
-
-                        comando.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error al agregar cliente a la base de datos: " + ex.Message);
-            }
-        }
-
-        public void EditarCliente(int clienteId, string nombre, string telefono, string correo, string direccion)
-        {
-            try
-            {
-                using (SqlConnection conexion = new SqlConnection(cadenaConexion))
-                {
-                    conexion.Open();
-
-                    string consulta = "UPDATE Clientes SET Nombre = @Nombre, Telefono = @Telefono, Correo = @Correo, DireccionFisica = @Direccion WHERE ClienteId = @ClienteId";
-                    using (SqlCommand comando = new SqlCommand(consulta, conexion))
-                    {
-                        comando.Parameters.AddWithValue("@ClienteId", clienteId);
-                        comando.Parameters.AddWithValue("@Nombre", nombre);
-                        comando.Parameters.AddWithValue("@Telefono", telefono);
-                        comando.Parameters.AddWithValue("@Correo", correo);
-                        comando.Parameters.AddWithValue("@Direccion", direccion);
-
-                        comando.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error al editar cliente en la base de datos: " + ex.Message);
-            }
-        }
-
-        public void EliminarCliente(int clienteId)
-        {
-            try
-            {
-                using (SqlConnection conexion = new SqlConnection(cadenaConexion))
-                {
-                    conexion.Open();
-
-                    string consulta = "DELETE FROM Clientes WHERE ClienteId = @ClienteId";
-                    using (SqlCommand comando = new SqlCommand(consulta, conexion))
-                    {
+                        comando.Parameters.AddWithValue("@FechaInicio", fechaInicio);
+                        comando.Parameters.AddWithValue("@FechaFin", fechaFin);
+                        comando.Parameters.AddWithValue("@Estado", estado);
                         comando.Parameters.AddWithValue("@ClienteId", clienteId);
 
                         comando.ExecuteNonQuery();
@@ -126,7 +72,58 @@ namespace ControlDeTareas
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error al eliminar cliente de la base de datos: " + ex.Message);
+                Console.WriteLine("Error al agregar proyecto a la base de datos: " + ex.Message);
+            }
+        }
+
+        public void EditarProyecto(int proyectoId, string nombre, DateTime fechaInicio, DateTime fechaFin, string estado, int clienteId)
+        {
+            try
+            {
+                using (SqlConnection conexion = new SqlConnection(cadenaConexion))
+                {
+                    conexion.Open();
+
+                    string consulta = "UPDATE Proyectos SET Nombre = @Nombre, FechaInicio = @FechaInicio, FechaFin = @FechaFin, Estado = @Estado, ClienteId = @ClienteId WHERE ProyectoId = @ProyectoId";
+                    using (SqlCommand comando = new SqlCommand(consulta, conexion))
+                    {
+                        comando.Parameters.AddWithValue("@ProyectoId", proyectoId);
+                        comando.Parameters.AddWithValue("@Nombre", nombre);
+                        comando.Parameters.AddWithValue("@FechaInicio", fechaInicio);
+                        comando.Parameters.AddWithValue("@FechaFin", fechaFin);
+                        comando.Parameters.AddWithValue("@Estado", estado);
+                        comando.Parameters.AddWithValue("@ClienteId", clienteId);
+
+                        comando.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error al editar proyecto en la base de datos: " + ex.Message);
+            }
+        }
+
+        public void EliminarProyecto(int proyectoId)
+        {
+            try
+            {
+                using (SqlConnection conexion = new SqlConnection(cadenaConexion))
+                {
+                    conexion.Open();
+
+                    string consulta = "DELETE FROM Proyectos WHERE ProyectoId = @ProyectoId";
+                    using (SqlCommand comando = new SqlCommand(consulta, conexion))
+                    {
+                        comando.Parameters.AddWithValue("@ProyectoId", proyectoId);
+
+                        comando.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error al eliminar proyecto de la base de datos: " + ex.Message);
             }
         }
     }
